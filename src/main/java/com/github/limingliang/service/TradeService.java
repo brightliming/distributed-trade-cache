@@ -42,7 +42,7 @@ public interface TradeService {
      * 获得所有的交易记录
      * @return
      */
-    public List<Trade> getAll();
+    public List<Object> getAll();
 
     /**
      *
