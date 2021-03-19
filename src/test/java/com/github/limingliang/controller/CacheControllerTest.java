@@ -1,15 +1,15 @@
 package com.github.limingliang.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.limingliang.entity.Page;
+import com.github.limingliang.entity.QueryRequest;
 import com.github.limingliang.entity.Trade;
 import com.github.limingliang.service.TradeService;
 import com.github.limingliang.utils.DateUtil;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -59,6 +59,7 @@ public class CacheControllerTest {
     }
 
     @Test
+    @Ignore
     public void testAddTrade() throws Exception {
         Trade trade = new Trade();
         trade.setTradeId(11l);
@@ -80,5 +81,79 @@ public class CacheControllerTest {
         Assert.assertEquals(200,status);
         Assert.assertTrue(Boolean.parseBoolean(result));
     }
+
+    @Test
+    @Ignore
+    public void testGetAllTrades() throws Exception{
+        MvcResult mvcResult=mockMvc.perform(MockMvcRequestBuilders.get("/getAllTrades")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+        int status=mvcResult.getResponse().getStatus();
+        List<Trade> trades = JSONArray.parseArray(mvcResult.getResponse().getContentAsString(),Trade.class);
+        Assert.assertEquals(200,status);
+        Assert.assertEquals(10l,trades.size());
+    }
+
+    @Test
+    @Ignore
+    public void testDeleteTrade() throws Exception{
+        MvcResult mvcResult=mockMvc.perform(MockMvcRequestBuilders.delete("/deleteTrade/10")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+        int status=mvcResult.getResponse().getStatus();
+        String result = mvcResult.getResponse().getContentAsString();
+        Assert.assertEquals(200,status);
+        Assert.assertTrue(Boolean.parseBoolean(result));
+    }
+
+    @Test
+    @Ignore
+    public void testQueryTradeById() throws Exception{
+        MvcResult mvcResult=mockMvc.perform(MockMvcRequestBuilders.get("/queryTradeById/10")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+        int status=mvcResult.getResponse().getStatus();
+        Trade result = JSON.parseObject(mvcResult.getResponse().getContentAsString(),Trade.class);
+        Assert.assertEquals(200,status);
+        Assert.assertEquals(10l,result.getTradeId().longValue());
+    }
+
+    @Test
+    @Ignore
+    public void testGetTradeSize() throws Exception{
+        MvcResult mvcResult=mockMvc.perform(MockMvcRequestBuilders.get("/getTradeSize")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+        int status=mvcResult.getResponse().getStatus();
+        String result = mvcResult.getResponse().getContentAsString();
+        Assert.assertEquals(200,status);
+        Assert.assertEquals("10",result);
+    }
+
+    @Test
+    public void testGetTradeByPage() throws Exception{
+        QueryRequest request = new QueryRequest();
+        request.setPageNum(1);
+        request.setPageSize(5);
+        MvcResult mvcResult=mockMvc.perform(MockMvcRequestBuilders.post("/getTradeByPage")
+                .content(JSON.toJSONString(request))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+        int status=mvcResult.getResponse().getStatus();
+        Page result = JSON.parseObject(mvcResult.getResponse().getContentAsString(), Page.class);
+        Assert.assertEquals(200,status);
+        Assert.assertEquals(5,result.getRecords().size());
+    }
+
 
 }
