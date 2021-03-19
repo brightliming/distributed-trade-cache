@@ -5,7 +5,7 @@ import com.github.limingliang.entity.QueryRequest;
 import com.github.limingliang.entity.Trade;
 import com.github.limingliang.service.RedisService;
 import com.github.limingliang.service.TradeService;
-import com.github.limingliang.util.CacheConstants;
+import com.github.limingliang.utils.CacheConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

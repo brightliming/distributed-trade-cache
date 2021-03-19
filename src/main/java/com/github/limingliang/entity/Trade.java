@@ -23,7 +23,7 @@ public class Trade implements Serializable {
     @NotBlank(message = "{required}")
     private String updateBy;
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    private Date updateDime;
+    private Date updateTime;
     @Override
     public String toString() {
         return "Trade{" +
@@ -33,7 +33,7 @@ public class Trade implements Serializable {
                 ", product='" + product + '\'' +
                 ", amount=" + amount +
                 ", updateBy='" + updateBy + '\'' +
-                ", updateDime=" + updateDime +
+                ", updateDime=" + updateTime +
                 '}';
     }
 
@@ -87,11 +87,11 @@ public class Trade implements Serializable {
         this.updateBy = updateBy;
     }
 
-    public Date getUpdateDime() {
-        return updateDime;
+    public Date getUpdateTime() {
+        return updateTime;
     }
 
-    public void setUpdateDime(Date updateDime) {
-        this.updateDime = updateDime;
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 }
