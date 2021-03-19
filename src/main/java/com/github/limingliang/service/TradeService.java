@@ -20,23 +20,35 @@ public interface TradeService {
 
     /**
      * 批量更新交易表
-     * @param trade
+     * @param trades
      * @return
      */
-    public boolean batchSave(List<Trade> trade);
+    public boolean batchSave(List<Trade> trades);
 
+    /**
+     * 删除交易记录
+     * @param tradeId
+     * @return
+     */
+    public boolean delete(String tradeId);
+
+    /**
+     * 删除交易记录表
+     * @return
+     */
+    public boolean deleteTable();
     /**
      * 通过交易ID获得交易记录
      * @param tradeId
      * @return
      */
-    public Trade getById(Long tradeId);
+    public Trade getById(String tradeId);
 
     /**
      * 获得交易记录数量
      * @return
      */
-    public Long getSize();
+    public Integer getSize();
 
     /**
      * 获得所有的交易记录

@@ -1,12 +1,16 @@
 package com.github.limingliang.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.NumberFormat;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 public class Trade implements Serializable {
+    @NotNull(message = "{required}")
     private Long tradeId;
     @JsonFormat(pattern="yyyy-MM-dd")
     private Date tradeDate;
@@ -14,9 +18,9 @@ public class Trade implements Serializable {
     private String client;
 
     private String product;
-
+    @NumberFormat
     private BigDecimal amount;
-
+    @NotBlank(message = "{required}")
     private String updateBy;
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date updateDime;

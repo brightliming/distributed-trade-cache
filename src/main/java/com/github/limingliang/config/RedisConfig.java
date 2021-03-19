@@ -11,10 +11,15 @@
  */
 package com.github.limingliang.config;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.limingliang.entity.Trade;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -24,21 +29,24 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  */
 @Configuration
 public class RedisConfig {
-		@Bean("tradeRedisTemplate")
-	    public RedisTemplate<String, Trade> redisTemplate(
-	            RedisConnectionFactory redisConnectionFactory) {
-	        RedisTemplate<String, Trade> template = new RedisTemplate<>();
-	        //使用fastjson序列化
-	        Jackson2JsonRedisSerializer<Trade> fastJsonRedisSerializer = new Jackson2JsonRedisSerializer<Trade>(Trade.class);
-	        // value值的序列化采用fastJsonRedisSerializer
-	        template.setValueSerializer(fastJsonRedisSerializer);
-	        template.setHashValueSerializer(fastJsonRedisSerializer);
-	        // key的序列化采用StringRedisSerializer
-	        template.setKeySerializer(new StringRedisSerializer());
-	        template.setHashKeySerializer(new StringRedisSerializer());
-	 
-	        template.setConnectionFactory(redisConnectionFactory);
-	        return template;
-	    }
+		@Bean(name = "redisTemplate")
+		public RedisTemplate<String, Object> redisObjectTemplate(RedisConnectionFactory factory) {
+			RedisTemplate<String, Object> template = new RedisTemplate<>();
+			template.setConnectionFactory(factory);
+			Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+			mapper.activateDefaultTyping(mapper.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL);
+			jackson2JsonRedisSerializer.setObjectMapper(mapper);
+
+			StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+			template.setKeySerializer(stringRedisSerializer);
+			template.setHashKeySerializer(stringRedisSerializer);
+			template.setValueSerializer(jackson2JsonRedisSerializer);
+			template.setHashValueSerializer(jackson2JsonRedisSerializer);
+			template.afterPropertiesSet();
+
+			return template;
+		}
 		
 }

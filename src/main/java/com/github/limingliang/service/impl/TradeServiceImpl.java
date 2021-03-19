@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class TradeServiceImpl implements TradeService {
@@ -18,33 +20,56 @@ public class TradeServiceImpl implements TradeService {
 
     @Override
     public boolean save(Trade trade) {
-        redisService.hset(CacheConstants.TRADE_CACHE_PREFIX,trade.getTradeId()+"",trade);
-        Trade trade1 = (Trade)redisService.hget(CacheConstants.TRADE_CACHE_PREFIX,trade.getTradeId()+"");
+        redisService.setPage(CacheConstants.TRADE_CACHE_PREFIX,trade.getTradeId()+"",(double)trade.getTradeId(),trade);
         return true;
     }
 
     @Override
-    public boolean batchSave(List<Trade> trade) {
+    public boolean batchSave(List<Trade> trades) {
+        trades.stream().forEach(trade -> {
+            redisService.setPage(CacheConstants.TRADE_CACHE_PREFIX,trade.getTradeId()+"",(double)trade.getTradeId(),trade);
+        });
         return false;
     }
 
     @Override
-    public Trade getById(Long tradeId) {
-        return null;
+    public boolean delete(String tradeId) {
+        return redisService.delPage(CacheConstants.TRADE_CACHE_PREFIX,tradeId);
     }
 
     @Override
-    public Long getSize() {
-        return null;
+    public boolean deleteTable() {
+        return redisService.delPageTable(CacheConstants.TRADE_CACHE_PREFIX);
+    }
+
+    @Override
+    public Trade getById(String tradeId) {
+        return (Trade) redisService.hget(CacheConstants.TRADE_CACHE_PREFIX,tradeId);
+    }
+
+    @Override
+    public Integer getSize() {
+        return redisService.getSize(CacheConstants.TRADE_CACHE_PREFIX);
     }
 
     @Override
     public List<Object> getAll() {
-        return redisService.hvalues(CacheConstants.TRADE_CACHE_PREFIX);
+        Set<Object> keys =  redisService.getPageAll(CacheConstants.TRADE_CACHE_PREFIX);
+        List<Object> result = redisService.hMultiGet(CacheConstants.TRADE_CACHE_PREFIX,keys);
+        return result;
     }
 
     @Override
     public Page<Trade> getByPage(QueryRequest request) {
-        return null;
+
+        Set<Object> keys =  redisService.getPage(CacheConstants.TRADE_CACHE_PREFIX,request.getPageNum(),request.getPageSize());
+        List<Object> result = redisService.hMultiGet(CacheConstants.TRADE_CACHE_PREFIX,keys);
+        List<Trade> tradeRecords = result.stream().map(o -> (Trade)o).collect(Collectors.toList());
+        Page<Trade> page = new Page<>();
+        page.setCurrent(request.getPageNum());
+        page.setSize(request.getPageSize());
+        page.setTotal(redisService.getSize(CacheConstants.TRADE_CACHE_PREFIX));
+        page.setRecords(tradeRecords);
+        return page;
     }
 }
