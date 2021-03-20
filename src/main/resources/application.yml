@@ -4,13 +4,13 @@ spring:
   application:
     name: DistributedTradeCacheApplication
   redis:
-    password: 123456
+    password: ${REDIS_PWD}
     sentinel:
       master: mymaster
       nodes:
-        - 192.168.3.18:26379
-        - 192.168.3.18:26380
-        - 192.168.3.18:26381
+        - ${REDIS1_URL}
+        - ${REDIS2_URL}
+        - ${REDIS3_URL}
 logging:
   config: classpath:logback-spring.xml
 #swagger开关
