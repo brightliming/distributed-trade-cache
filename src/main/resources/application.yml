@@ -8,8 +8,11 @@ spring:
     sentinel:
       master: mymaster
       nodes:
-        - 172.27.107.50:26379
-        - 172.27.107.50:26380
-        - 172.27.107.50:26381
+        - 192.168.3.18:26379
+        - 192.168.3.18:26380
+        - 192.168.3.18:26381
 logging:
   config: classpath:logback-spring.xml
+#swagger开关
+swagger2:
+  enable: true
